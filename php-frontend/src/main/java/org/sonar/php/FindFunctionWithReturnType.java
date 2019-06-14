@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,10 +52,18 @@ public class FindFunctionWithReturnType {
   static final ActionParser<Tree> parser = PHPParserBuilder.createParser();
 
   static final Pattern RETURN_COMMENT = Pattern.compile("(@return|@var)\\s+([\\S]+)");
-  static final List<String> TYPES_TO_FIND = Arrays.asList("\\Illuminate\\Support\\Facades\\Input");
+  static final List<String> TYPES_TO_FIND = Arrays.asList("Illuminate\\\\Database\\\\Query\\\\Builder");
+
+  public static Predicate<String> matchesType = new Predicate<String>() {
+    public boolean test(String type) {
+      return TYPES_TO_FIND.stream()
+              .map(typeToFind -> Pattern.compile(typeToFind, Pattern.CASE_INSENSITIVE))
+              .anyMatch(pattern -> pattern.matcher(type).find());
+    }
+  };
 
   public static void main(String[] args) throws Exception {
-    String dir = "/Users/pierre-loup/Developer/php/laravel/laravel-datatables-demo/public/vendor/laravel";
+    String dir = "/";
     Files.walk(Paths.get(dir))
       .filter(p -> p.toString().endsWith(".php"))
       .forEach(FindFunctionWithReturnType::analyze);
@@ -95,7 +104,9 @@ class Visitor extends PHPVisitorCheck {
 
   @Override
   public void visitMethodDeclaration(MethodDeclarationTree tree) {
-    analyzeFunction(tree, symbolTable.getSymbol(tree.name()));
+    if(!tree.modifiers().contains("private")) {
+      analyzeFunction(tree, symbolTable.getSymbol(tree.name()));
+    }
     super.visitMethodDeclaration(tree);
   }
 
@@ -116,7 +127,7 @@ class Visitor extends PHPVisitorCheck {
         .map(this::returnTypeName)
         .collect(Collectors.toList());
     }
-    if (returnTypes.stream().anyMatch(FindFunctionWithReturnType.TYPES_TO_FIND::contains)) {
+    if (returnTypes.stream().anyMatch(FindFunctionWithReturnType.matchesType)) {
       found.add(symbol);
     }
   }
@@ -129,7 +140,7 @@ class Visitor extends PHPVisitorCheck {
               .map(this::returnTypeName)
               .collect(Collectors.toList());
     }
-    if (returnTypes.stream().anyMatch(FindFunctionWithReturnType.TYPES_TO_FIND::contains) && !tree.hasModifiers("private")) {
+    if (returnTypes.stream().anyMatch(FindFunctionWithReturnType.matchesType) && !tree.hasModifiers("private")) {
       tree.declarations().forEach(this::addClassProperty);
     }
   }
