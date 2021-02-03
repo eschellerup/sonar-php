@@ -29,7 +29,7 @@ public class PhpPlugin implements Plugin {
 
   public static final String FILE_SUFFIXES_KEY = "sonar.php.file.suffixes";
   public static final String PHPUNIT_COVERAGE_REPORT_PATHS_KEY = "sonar.php.coverage.reportPaths";
-  public static final String PHPUNIT_TESTS_REPORT_PATH_KEY = "sonar.php.tests.reportPath";
+  public static final String PHPUNIT_TESTS_REPORT_PATHS_KEY = "sonar.php.tests.reportPaths";
   public static final String PHP_EXCLUSIONS_KEY = "sonar.php.exclusions";
   public static final String PHP_EXCLUSIONS_DEFAULT_VALUE = "**/vendor/**";
 
@@ -80,11 +80,12 @@ public class PhpPlugin implements Plugin {
 
     if (context.getRuntime().getProduct() != SonarProduct.SONARLINT) {
       context.addExtension(
-        PropertyDefinition.builder(PHPUNIT_TESTS_REPORT_PATH_KEY)
+        PropertyDefinition.builder(PHPUNIT_TESTS_REPORT_PATHS_KEY)
           .name("Unit Test Report")
-          .description("Path to the PHPUnit unit test execution report file. The path may be either absolute or relative to the project base directory.")
+          .description("List of PHPUnit unit test execution report files. Each path can be either absolute or relative.")
           .onQualifiers(Qualifiers.MODULE, Qualifiers.PROJECT)
           .category(PHP_CATEGORY)
+          .multiValues(true)
           .subCategory(PHPUNIT_SUBCATEGORY)
           .build());
     }

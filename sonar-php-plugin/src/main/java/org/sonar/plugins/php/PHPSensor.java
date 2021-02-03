@@ -135,8 +135,7 @@ public class PHPSensor implements Sensor {
   }
 
   private static void processTestsAndCoverage(SensorContext context) {
-    new TestResultImporter().importReport(context);
-
+    TestResultImporter.multiTestImporter().importReport(context);
     CoverageResultImporter.multiCoverageImporter().importReport(context);
   }
 

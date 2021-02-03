@@ -29,7 +29,12 @@ public class TestResultImporter extends SingleFileReportImporter {
   private final JUnitLogParserForPhpUnit parser = new JUnitLogParserForPhpUnit();
 
   public TestResultImporter() {
-    super(PhpPlugin.PHPUNIT_TESTS_REPORT_PATH_KEY, "test");
+    super(PhpPlugin.PHPUNIT_TESTS_REPORT_PATHS_KEY, "test");
+  }
+
+  public static ReportImporter multiTestImporter() {
+    TestResultImporter singleReportImporter = new TestResultImporter();
+    return new MultiPathImporter(singleReportImporter, PhpPlugin.PHPUNIT_TESTS_REPORT_PATHS_KEY, "test");
   }
 
   @Override

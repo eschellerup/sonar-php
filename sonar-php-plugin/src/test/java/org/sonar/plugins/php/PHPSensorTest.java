@@ -394,7 +394,7 @@ public class PHPSensorTest {
 
   @Test
   public void should_disable_unnecessary_features_for_sonarlint() throws Exception {
-    context.settings().setProperty(PhpPlugin.PHPUNIT_TESTS_REPORT_PATH_KEY, PhpTestUtils.PHPUNIT_REPORT_NAME);
+    context.settings().setProperty(PhpPlugin.PHPUNIT_TESTS_REPORT_PATHS_KEY, PhpTestUtils.PHPUNIT_REPORT_NAME);
     context.settings().setProperty(PhpPlugin.PHPUNIT_COVERAGE_REPORT_PATHS_KEY, PhpTestUtils.PHPUNIT_COVERAGE_REPORT);
     DefaultInputFile inputFile = inputFile(ANALYZED_FILE);
 
@@ -502,7 +502,7 @@ public class PHPSensorTest {
     context.setRuntime(SONARQUBE_6_7);
     createSensor().execute(context);
     assertThat(logTester.logs()).contains(
-      "No PHPUnit test report provided (see '" + PhpPlugin.PHPUNIT_TESTS_REPORT_PATH_KEY + "' property)",
+      "No PHPUnit test reports provided (see '" + PhpPlugin.PHPUNIT_TESTS_REPORT_PATHS_KEY + "' property)",
       "No PHPUnit coverage reports provided (see '" + PhpPlugin.PHPUNIT_COVERAGE_REPORT_PATHS_KEY + "' property)");
 
     logTester.clear();
